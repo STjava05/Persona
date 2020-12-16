@@ -5,52 +5,49 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import it.esedra.persona.fragments.MainMenuFragment;
+
 public class MainActivity extends AppCompatActivity {
 
     public static FragmentManager fragmentManager;
-    public static Fragment fragmentLoaded;
 
-    @SuppressLint("SourceLockedOrientationActivity")
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        if(savedInstanceState == null){
-            setContentView(R.layout.activity_main);
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-            hideNavigationBar();
+        fragmentManager = getSupportFragmentManager();
 
-            fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.container_fragment, new MainMenuFragment(this)).commit();
 
-            /*fragmentLoaded = new FirstFragment();
-            fragmentManager.beginTransaction().add(R.id.container_fragment, fragmentLoaded)
-                    .commit();*/
+        //OutputStreamWriter osw = new OutputStreamWriter(openFileOutput("allTexts.txt", MODE_PRIVATE), StandardCharsets.UTF_8);
 
-            new AsyncLoadFragment(new FirstFragment(), Transitions.FADE).execute();
+        try(FileOutputStream fos = openFileOutput("allTexts.txt", Context.MODE_PRIVATE)) {
+            String line1 = "Ciao" + "\n";
+            String line2 = "Addio" + "\n";
+            String line3 = "OK" + "\n";
+            String line4 = "Prova" + "\n";
+            String line5 = "Test";
+            fos.write(line1.getBytes());
+            fos.write(line2.getBytes());
+            fos.write(line3.getBytes());
+            fos.write(line4.getBytes());
+            fos.write(line5.getBytes());
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }
-
-    private void hideNavigationBar(){
-        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-
-        View decorView = getWindow().getDecorView();
-
-        decorView.setSystemUiVisibility(flags);
-        decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
-            if((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0){
-                decorView.setSystemUiVisibility(flags);
-            }
-        });
     }
 
 
